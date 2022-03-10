@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\CalculateInstallments;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +18,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/get_instalments', [CalculateInstallments::class, 'get_installments']);

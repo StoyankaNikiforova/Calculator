@@ -3,8 +3,11 @@
 <head>
     <title>Credit calculator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src={{URL::asset('js/calc_inst.js')}}></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
+
 <body>
 
 <div class="row">
@@ -14,7 +17,7 @@
            Calculate credit installments
         </div>
         <div class="card-body">
-            <form name="calculate-credit-installments" id="calculate-credit-installments" method="post" action="#">
+            <form name="calculate-credit-installments" id="calculate-credit-installments" method="get" >
                 @csrf
 
                 <div class="form-group">
@@ -28,7 +31,7 @@
                 </div>
                 <div class="form-group">
                     <label for="annual_interest_rate">Annual interest rate %</label>
-                    <input type="number" id="annual_interest_rate" name="instalments_count" class="form-control" required>
+                    <input type="number" id="annual_interest_rate" name="annual_interest_rate" class="form-control" required>
                 </div>
 
                 <div class="form-group">
@@ -47,6 +50,9 @@
 
                 <button type="submit" id="submit" class="btn btn-primary">Submit</button>
             </form>
+        </div>
+        <div>
+
         </div>
     </div>
 </div>
