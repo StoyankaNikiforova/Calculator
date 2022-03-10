@@ -4,10 +4,10 @@ $(document).ready(function (){
         let instalments_count = $("input[name=instalments_count]").val();        //
         let credit_amount = $("input[name=credit_amount]").val();
         let annual_interest_rate = $("input[name=annual_interest_rate]").val();
-        let maturity_date = $("select[name=maturity_date]").val();
+        let maturity_day = $("select[name=maturity_day]").val();
         let _token   = $('meta[name="csrf-token"]').attr('content');
         let utilisation_date = $("input[name=utilisation_date]").val();
-        console.log(instalments_count+"  "+ credit_amount+" "+annual_interest_rate+" "+maturity_date+" "+utilisation_date);
+        console.log(instalments_count+"  "+ credit_amount+" "+annual_interest_rate+" "+maturity_day+" "+utilisation_date);
         $.ajax({
             url: "/get_instalments",
             type:"GET",
@@ -15,7 +15,7 @@ $(document).ready(function (){
                 instalments_count:instalments_count,
                 credit_amount:credit_amount,
                 annual_interest_rate:annual_interest_rate,
-                maturity_date:maturity_date,
+                maturity_day:maturity_day,
                 utilisation_date:utilisation_date,
                 _token: _token
             },
@@ -23,11 +23,14 @@ $(document).ready(function (){
                 console.log("test");
                 if(response) {
                     $('.success').text(response.success);
-                    //$("#ajaxform")[0].reset();
+
                 }
             },
-            error: function(error) {
-                console.log(error);
+            error: function(response) {
+                if (response.status ==422){
+                    console.log(response.responseJSON["errors"]["instalments_count"][0]);
+                }else {
+                }
             }
         });
     });
