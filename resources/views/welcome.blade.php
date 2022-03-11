@@ -13,9 +13,9 @@
 <div class="row">
 
     <div class="mt-5 col-md-8 offset-md-2">
-        <div class="card-header text-center font-weight-bold">
+        <h1 class="card-header text-center mt-6">
            Calculate credit installments
-        </div>
+        </h1>
         @if (count($errors)>0)
             <div class="alert alert-danger">
                 <ul>

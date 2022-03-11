@@ -19,11 +19,10 @@ $(document).ready(function (){
                 utilisation_date:utilisation_date,
                 _token: _token
             },
-            success:function(response){ {{route('/test')}}
-                console.log(response);
+            success:function(response){
+                $('#result').html(response);
                 if(response) {
-
-                   //$('.success').text(response.success);
+                    $('.success').text(response.success);
 
                 }
             },

@@ -65,7 +65,14 @@ class CalculateInstallments extends Controller
         $rows = array();
         $first_maturity_day = $this->get_first_maturity_date($maturity_day, $utilisation_date);
         $installment = $this->get_installment_amount($instalments_count, $credit_amount,  $annual_interest_rate);
-        $rows[] = array('number'=>0, 'installment'=> $installment, 'head_amount'=>'','interest_amount'=>'', 'credit_amount_left'=>$credit_amount, 'maturity_date'=>$first_maturity_day);
+        $rows[] = array(
+            'number'=>0,
+            'installment'=> round($installment,2),
+            'head_amount'=>'',
+            'interest_amount'=>'',
+            'credit_amount_left'=>round($credit_amount,2),
+            'maturity_date'=>$first_maturity_day);
+
         $maturity_date = $this->get_next_maturity_date($first_maturity_day);
         $interest_per_month = $annual_interest_rate/12;
         $interest_amount = ($credit_amount*$interest_per_month)/100;
@@ -73,9 +80,14 @@ class CalculateInstallments extends Controller
         $head_credit_amount = $credit_amount - $head_amount;
 
         for($i=1; $i<= $instalments_count; $i++){
-            //$row = $this->get_row($i, $installment, $annual_interest_rate, $maturity_date, $head_credit_amount);
-            $rows[] =array( 'number'=>$i, 'installment'=> $installment, 'head_amount'=>$head_amount,'interest_amount'=>$interest_amount,
-                'credit_amount_left'=>$head_credit_amount, 'maturity_date'=>$maturity_date);
+            $rows[] =array(
+                'number'=>$i,
+                'installment'=>round( $installment, 2),
+                'head_amount'=>round($head_amount, 2),
+                'interest_amount'=>round($interest_amount, 2),
+                'credit_amount_left'=>round($head_credit_amount, 2),
+                'maturity_date'=>$maturity_date);
+
             $maturity_date = $this->get_next_maturity_date($maturity_date);
             $interest_amount = ($head_credit_amount*$interest_per_month)/100;
             $head_amount = $installment - $interest_amount;

@@ -20,6 +20,7 @@ Route::get('/', function () {
 });
 
 Route::get('/get_instalments', [CalculateInstallments::class, 'get_installments']);
+
 Route::get('/test', function (){
-    return view('table');
+    return View::make("table");
 });
