@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
 </head>
 <body>
 <main class="flex-shrink-0">
     <div class="container">
         <h1 class="mt-6">Repayment schedule</h1>
 
-        <table class="table" id="projects-table">
+        <table class="table" id="table">
             <thead>
             <tr>
                 <th scope="col">#</th>

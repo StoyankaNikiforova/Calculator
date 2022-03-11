@@ -6,6 +6,7 @@ use DateTime;
 use http\Exception\UnexpectedValueException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 class CalculateInstallments extends Controller
 {
@@ -62,8 +63,11 @@ class CalculateInstallments extends Controller
 
 
     private function get_table_rows($instalments_count, $credit_amount,  $annual_interest_rate, $maturity_day, $utilisation_date){
+        $eom = false;
+        if($maturity_day == "EOM"){
+            $eom = true;
+        }
         $rows = array();
-        $first_maturity_day = $this->get_first_maturity_date($maturity_day, $utilisation_date);
         $installment = $this->get_installment_amount($instalments_count, $credit_amount,  $annual_interest_rate);
         $rows[] = array(
             'number'=>0,
@@ -71,15 +75,16 @@ class CalculateInstallments extends Controller
             'head_amount'=>'',
             'interest_amount'=>'',
             'credit_amount_left'=>round($credit_amount,2),
-            'maturity_date'=>$first_maturity_day);
+            'maturity_date'=>'');
 
-        $maturity_date = $this->get_next_maturity_date($first_maturity_day);
+        $maturity_date = $this->get_first_maturity_date($maturity_day, $utilisation_date);
         $interest_per_month = $annual_interest_rate/12;
         $interest_amount = ($credit_amount*$interest_per_month)/100;
         $head_amount = $installment - $interest_amount;
         $head_credit_amount = $credit_amount - $head_amount;
 
         for($i=1; $i<= $instalments_count; $i++){
+
             $rows[] =array(
                 'number'=>$i,
                 'installment'=>round( $installment, 2),
@@ -88,7 +93,7 @@ class CalculateInstallments extends Controller
                 'credit_amount_left'=>round($head_credit_amount, 2),
                 'maturity_date'=>$maturity_date);
 
-            $maturity_date = $this->get_next_maturity_date($maturity_date);
+            $maturity_date = $this->get_next_maturity_date($maturity_date, $eom);
             $interest_amount = ($head_credit_amount*$interest_per_month)/100;
             $head_amount = $installment - $interest_amount;
             $head_credit_amount = $head_credit_amount -$head_amount;
@@ -96,38 +101,35 @@ class CalculateInstallments extends Controller
         return $rows;
     }
 
-//    private function get_row($number,  $installment, $annual_interest_rate, $maturity_date, $head_credit_amount, $credit_amount_left){
-//        $interest_per_month = $annual_interest_rate/12;
-//        $interest_amount = ($head_credit_amount*$interest_per_month)/100;
-//        $head_amount = $installment - $interest_amount;
-//        $row = array( 'number'=>$number, 'installment'=> $installment, 'head_amount'=>$head_amount,'interest_amount'=>$interest_amount,
-//        'credit_amount_left'=>$credit_amount_left, 'maturity_date'=>$maturity_date);
-//        return $row;
-//
-//    }
-
-    private function get_next_maturity_date($current_maturity_date): string
+    private function get_next_maturity_date($current_maturity_date, $eom): string
     {
-        return date('Y-m-d', strtotime(' +1 month', strtotime($current_maturity_date)));
+        $maturity_date = Carbon::create($current_maturity_date);
+        $maturity_date->addMonth(1);
+        if($eom){
+            $maturity_date->subDay(7);
+            $maturity_date = Carbon::parse($maturity_date)->endOfMonth();
+        }
+        return $maturity_date->format('Y-m-d') ;
+
     }
 
     private function get_first_maturity_date($maturity_day, $utilisation_date){
+
         $utilisation_day = date('d',strtotime($utilisation_date));
         $day = 10;
-        if($maturity_day!="EOM"){
-            $day = $maturity_day;
-        }
         $month =  date('m',strtotime($utilisation_date));
         $year = date('Y',strtotime($utilisation_date));
-        $maturity_date = new DateTime();
-
-        $maturity_date->setDate($year, $month, $day);
-
-        if( $utilisation_day > $maturity_day ){
-            $maturity_date->setDate($year, $month+1, $day);
+        $maturity_date = Carbon::create($utilisation_date);
+        if($maturity_day!="EOM"){
+            $day = $maturity_day;
+            $maturity_date = Carbon::create($year, $month, $day);
+            if( $utilisation_day > $maturity_day){
+                $maturity_date->addMonth(1);
+            }
         }
         if($maturity_day=="EOM"){
-           return $maturity_date->format('Y-m-t');
+            $mat_date = Carbon::parse($maturity_date)->endOfMonth()->toDateString();
+            return $mat_date;
         }else{
             return $maturity_date->format('Y-m-d');
         }
