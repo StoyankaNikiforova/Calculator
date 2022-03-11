@@ -19,11 +19,8 @@ class CalculateInstallments extends Controller
             $maturity_day = $request->input('maturity_day');
             $utilisation_date = $request->date('utilisation_date');
 
-            $installment = $this->get_installment_amount($instalments_count, $credit_amount, $annual_interest_rate);
-            $first_maturity_day = $this->get_first_maturity_date($maturity_day, $utilisation_date);
-            echo $first_maturity_day;
-
-            $this->get_next_maturity_date($utilisation_date);
+            $rows = $this->get_table_rows($instalments_count, $credit_amount,  $annual_interest_rate, $maturity_day, $utilisation_date);
+            return view('table', compact('rows'));
 
         }
 
@@ -64,13 +61,38 @@ class CalculateInstallments extends Controller
     }
 
 
-    private function get_table_rows(){
+    private function get_table_rows($instalments_count, $credit_amount,  $annual_interest_rate, $maturity_day, $utilisation_date){
+        $rows = array();
+        $first_maturity_day = $this->get_first_maturity_date($maturity_day, $utilisation_date);
+        $installment = $this->get_installment_amount($instalments_count, $credit_amount,  $annual_interest_rate);
+        $rows[] = array('number'=>0, 'installment'=> $installment, 'head_amount'=>'','interest_amount'=>'', 'credit_amount_left'=>$credit_amount, 'maturity_date'=>$first_maturity_day);
+        $maturity_date = $this->get_next_maturity_date($first_maturity_day);
+        $interest_per_month = $annual_interest_rate/12;
+        $interest_amount = ($credit_amount*$interest_per_month)/100;
+        $head_amount = $installment - $interest_amount;
+        $head_credit_amount = $credit_amount - $head_amount;
 
+        for($i=1; $i<= $instalments_count; $i++){
+            //$row = $this->get_row($i, $installment, $annual_interest_rate, $maturity_date, $head_credit_amount);
+            $rows[] =array( 'number'=>$i, 'installment'=> $installment, 'head_amount'=>$head_amount,'interest_amount'=>$interest_amount,
+                'credit_amount_left'=>$head_credit_amount, 'maturity_date'=>$maturity_date);
+            $maturity_date = $this->get_next_maturity_date($maturity_date);
+            $interest_amount = ($head_credit_amount*$interest_per_month)/100;
+            $head_amount = $installment - $interest_amount;
+            $head_credit_amount = $head_credit_amount -$head_amount;
+        }
+        return $rows;
     }
 
-    private function get_row(){
-
-    }
+//    private function get_row($number,  $installment, $annual_interest_rate, $maturity_date, $head_credit_amount, $credit_amount_left){
+//        $interest_per_month = $annual_interest_rate/12;
+//        $interest_amount = ($head_credit_amount*$interest_per_month)/100;
+//        $head_amount = $installment - $interest_amount;
+//        $row = array( 'number'=>$number, 'installment'=> $installment, 'head_amount'=>$head_amount,'interest_amount'=>$interest_amount,
+//        'credit_amount_left'=>$credit_amount_left, 'maturity_date'=>$maturity_date);
+//        return $row;
+//
+//    }
 
     private function get_next_maturity_date($current_maturity_date): string
     {
