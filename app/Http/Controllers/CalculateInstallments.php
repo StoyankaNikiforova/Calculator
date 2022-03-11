@@ -30,27 +30,30 @@ class CalculateInstallments extends Controller
     private function get_valid(Request $request)
     {
         $rules = [
-            'instalments_count' => 'required|numeric',
-            'credit_amount' => 'required|numeric',
+            'instalments_count' => 'required|numeric|min:3|max:24',
+            'credit_amount' => 'required|numeric|min:500|max:5000',
             'annual_interest_rate' => 'required|numeric',
-            'maturity_day' => 'required',
+            'maturity_day'=> 'required',
+            'utilisation_date' => 'required',
 
         ];
         $messages = [
             'instalments_count.required' => 'Number of installments cannot be blank',
-            'credit_amount.numeric' => 'credit_amount must be a number',
+            'instalments_count.numeric' => 'Number of installments must be a number',
+            'instalments_count.min' => 'Number of installments cannot be small than 3',
+            'instalments_count.max' => 'Number of installments cannot be bigger than 24',
+            'credit_amount.numeric' => 'Credit amount must be a number',
+            'credit_amount.required' => 'Credit amount  cannot be blank',
+            'credit_amount.min' => 'Credit amount cannot be small than 500',
+            'credit_amount.max' => 'Credit amount cannot be bigger than 5000',
             'credit_amount .required' => 'Credit amount cannot be blank',
+            'annual_interest_rate.required' => 'Please select annual interest rate',
             'annual_interest_rate.numeric' => 'Credit amount must be a number',
+            'maturity_day.required' => 'Please select maturity day',
             'utilisation_date.required' => 'Please select date'
         ];
+
         $data = $request->validate($rules, $messages);
-
-        /**
-         * TODO
-         *
-         * @return ???
-         */
-
         return $data;
     }
     private function get_installment_amount($instalments_count, $credit_amount,  $annual_interest_rate){

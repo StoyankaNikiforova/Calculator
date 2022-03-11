@@ -23,10 +23,10 @@ $(document).ready(function (){
                 $('#result').html(response);
                 if(response) {
                     $('.success').text(response.success);
-
                 }
             },
             error: function(response) {
+                $('#result').empty();
                 if (response.status ==422){
                     console.log(response.responseJSON["errors"]["instalments_count"][0]);
                 }else {
